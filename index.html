@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-animate="true" data-explode="false">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galvin Card</title>
+  <link rel="stylesheet" href="https://unpkg.com/normalize.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+  
+  <style>
+    *,
+    *::after,
+    *::before {
+      box-sizing: border-box;
+      transform-style: preserve-3d;
+    }
+
+    :root {
+      --font-size-min: 16;
+      --font-size-max: 20;
+      --font-ratio-min: 1.2;
+      --font-ratio-max: 1.33;
+      --font-width-min: 375;
+      --font-width-max: 1500;
+    }
+
+    html {
+      color-scheme: light dark;
+    }
+
+    [data-theme="light"] {
+      color-scheme: light only;
+    }
+    [data-theme="dark"] {
+      color-scheme: dark only;
+    }
+
+    body {
+      background: light-dark(#fff, #000);
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: 'Sora', 'SF Pro Text', sans-serif;
+      margin: 0;
+    }
+
+    body::before {
+      --size: 45px;
+      --line: color-mix(in hsl, canvasText, transparent 80%);
+      content: '';
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      background: 
+        linear-gradient(90deg, var(--line) 1px, transparent 1px var(--size)) calc(var(--size) * 0.36) 50% / var(--size) var(--size),
+        linear-gradient(var(--line) 1px, transparent 1px var(--size)) 0% calc(var(--size) * 0.32) / var(--size) var(--size);
+      mask: linear-gradient(-20deg, transparent 50%, white);
+      top: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .bear-link {
+      color: canvasText;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      width: 48px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      opacity: 0.8;
+      z-index: 99999;
+      text-decoration: none;
+    }
+    .bear-link:hover {
+      opacity: 1;
+    }
+    .bear-link svg {
+      width: 75%;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    :root {
+      --border-color: hsl(0 0% 25%);
+      --card-width: 260px;
+      --pointer-x: 0;
+      --pointer-y: 0;
+    }
+
+    .scene {
+      perspective: 1000px;
+      position: fixed;
+      inset: 0;
+      transform: translate3d(0,0,100vmin);
+    }
+
+    .card {
+      --border: 8cqi;
+      aspect-ratio: 5 / 7;
+      width: var(--card-width);
+      container-type: inline-size;
+      touch-action: none;
+      background: transparent;
+      color: hsl(0 0% 10%);
+      font-family: 'Sora', sans-serif;
+      perspective: 1600px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+      transition: transform 0.2s;
+    }
+    .card[data-active="false"] {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .card img,
+    .card *::after,
+    .card *::before {
+      will-change: transform, scale, filter;
+    }
+
+    .card button {
+      position: absolute;
+      z-index: 100;
+      inset: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      opacity: 0;
+      background: transparent;
+      border: none;
+    }
+    .card *:not(button) {
+      pointer-events: none;
+    }
+
+    .card .debug,
+    .card .img,
+    .card .pattern,
+    .card .spotlight,
+    .card .watermark,
+    .card .card__rear,
+    .card .card__content,
+    .card .card__emboss,
+    .card .glare-container,
+    .card .card__front {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--border);
+    }
+
+    .card .debug {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .card .debug::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 4px dashed canvasText;
+      border-radius: var(--border);
+    }
+    .card .debug.debug--clipped {
+      clip-path: inset(0 0 0 0 round var(--border));
+    }
+    .card .debug .refraction {
+      opacity: 0.2;
+    }
+
+    .card .card__emboss {
+      filter: url(#lighting);
+    }
+
+    .card .card__front .img::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: hsl(0 0% 50%);
+    }
+
+    .card .card__front,
+    .card .card__rear {
+      backface-visibility: hidden;
+    }
+
+    .card .card__front > *:not(.debug--clipped) {
+      clip-path: inset(0 0 0 0 round var(--border));
+    }
+
+    .card .card__rear {
+      clip-path: inset(0 0 0 0 round var(--border));
+      --border-color: oklch(28.55% 0.09665 265.51);
+      transform-style: preserve-3d;
+      background: color-mix(in oklch, var(--border-color), #000);
+      transform: rotateY(180deg) translate3d(0,0,1px);
+    }
+
+    .card .card__rear > img,
+    .card .card__front > .img img {
+      width: 100%;
+      object-fit: cover;
+      height: 100%;
+      scale: 1.1;
+      position: absolute;
+      inset: 0;
+    }
+
+    .card .card__frame {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      border-radius: var(--border);
+    }
+    .card .card__frame h3 {
+      margin: 0;
+      top: var(--border);
+      right: var(--border);
+      text-align: right;
+      letter-spacing: -0.05em;
+      font-weight: 1000;
+      line-height: 1;
+      z-index: 100;
+      position: absolute;
+      opacity: 0;
+    }
+    .card .card__frame h3 span {
+      filter: url(#sticker);
+    }
+    .card .card__frame h3 span:first-of-type {
+      font-size: 10cqi;
+    }
+    .card .card__frame h3 span:last-of-type {
+      font-size: 5cqi;
+    }
+    .card .card__frame img {
+      width: 100%;
+      object-fit: cover;
+      height: 100%;
+      scale: 1.1;
+      position: absolute;
+      inset: 0;
+      filter: saturate(0.8) contrast(1.2) drop-shadow(0 0 10cqi hsl(0 0% 10% / 0.75));
+      opacity: 0;
+    }
+    .card .card__frame .signature {
+      color: hsl(45 20% 60%);
+      position: absolute;
+      z-index: 100;
+      width: 38cqi;
+      bottom: calc(var(--border) * 1.1);
+      right: calc(var(--border) * 0.6);
+      rotate: 20deg;
+    }
+    .card .card__frame .sticker {
+      position: absolute;
+      width: calc(var(--border) * 2.75);
+      bottom: calc(var(--border) * 0.75);
+      left: calc(var(--border) * 0.65);
+      z-index: 100;
+      opacity: 0;
+    }
+
+    .card:has([aria-pressed="true"]) .card__content {
+      rotate: 180deg y;
+    }
+
+    .card .card__content {
+      transition: rotate 0.26s ease-out;
+      transform-style: preserve-3d;
+      height: 100%;
+    }
+
+    .card .card__emboss {
+      position: absolute;
+      inset: 0;
+      filter: url(#lighting);
+      border-radius: var(--border);
+      clip-path: inset(0 0 0 0 round var(--border));
+    }
+    .card .card__emboss::before {
+      content: 'TechTrades © 2025';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      height: calc(var(--border) * 0.5);
+      display: flex;
+      place-items: center;
+      translate: -50% 0;
+      color: #fff;
+      font-size: 1.5cqi;
+      opacity: 0.8;
+      z-index: 100;
+    }
+    .card .card__emboss::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: calc(var(--border) * 0.5) solid var(--border-color);
+      border-radius: var(--border);
+      z-index: 99;
+    }
+
+    .card .img img {
+      filter: brightness(0.85);
+    }
+
+    .pattern, .watermark {
+      mask: url(https://assets.codepen.io/605876/figma-texture.png) 50% 50% / 4cqi 4cqi;
+      opacity: 0.4;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    .pattern::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: hsl(0 0% 80%);
+    }
+    .watermark {
+      mask: url(https://assets.codepen.io/605876/shopify-pattern.svg) 50% 50% / 14cqi 14cqi repeat;
+      opacity: 1;
+      mix-blend-mode: hard-light;
+    }
+    .watermark::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: hsl(0 0% 100% / 0.2);
+    }
+
+    .refraction {
+      position: absolute;
+      width: 500%;
+      aspect-ratio: 1 / 1;
+      bottom: 0;
+      left: 0;
+      filter: saturate(2);
+      will-change: transform;
+      background: radial-gradient(circle at 0 100%, #0000 10%, hsl(5 100% 80%), hsl(150 100% 60%), hsl(220 90% 70%), #0000 60%);
+      transform-origin: 0 100%;
+      scale: min(1, 0.15 + var(--pointer-x) * 0.25);
+      translate: clamp(-10%, -10% + var(--pointer-x) * 10%, 10%) calc(max(0%, (var(--pointer-y) * -1) * 10%));
+    }
+    .refraction:nth-of-type(2) {
+      bottom: unset;
+      top: 0;
+      left: unset;
+      right: 0;
+      scale: min(1, 0.15 + var(--pointer-x) * -0.65);
+      translate: clamp(-10%, 10% - var(--pointer-x) * -10%, 10%) calc(min(0%, var(--pointer-y) * -10%));
+      transform-origin: 100% 0;
+      background: radial-gradient(circle at 100% 0, #0000 10%, hsl(5 100% 80%), hsl(150 100% 60%), hsl(220 90% 70%), #0000 60%);
+    }
+
+
+    .glare {
+      position: absolute;
+      opacity: 0.5;
+      inset: 0;
+      background: linear-gradient(-65deg, #0000 0 40%, #fff 40% 50%, #0000 30% 50%, #0000 50% 55%, #fff 55% 60%, #0000 60% 100%);
+    }
+
+    .spotlight {
+      mix-blend-mode: overlay;
+      z-index: 9999999;
+      clip-path: inset(0 0 0 0 round var(--border));
+    }
+    .spotlight::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      border: 4px dashed canvasText;
+      border-radius: var(--border);
+    }
+    .spotlight::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 500%;
+      aspect-ratio: 1;
+      background: radial-gradient(hsl(0 0% 100% / 0.4) 0 2%, hsl(0 0% 10% / 0.2) 20%);
+      filter: brightness(1.2) contrast(1.2);
+      translate: calc(-50% + (var(--pointer-x) * 20%)) calc(-50% + (var(--pointer-y) * 20%));
+      z-index: 99999;
+      opacity: 0;
+    }
+
+    .wordmark {
+      position: absolute;
+      width: 70%;
+      left: 50%;
+      translate: -50% 0;
+      top: 12%;
+      height: max-content;
+    }
+    .wordmark::after {
+      content: '™';
+      position: absolute;
+      top: 100%;
+      right: 0;
+      color: #fff;
+    }
+    .wordmark:last-of-type {
+      top: unset;
+      bottom: 12%;
+      rotate: 180deg;
+    }
+    .wordmark img {
+      position: static;
+      width: 100%;
+      height: auto;
+    }
+
+    .gemstone {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50%;
+      height: auto;
+      translate: -50% -50%;
+      filter: hue-rotate(320deg);
+    }
+
+    .card[data-active="true"]:hover {
+      transform: rotateX(calc(var(--pointer-y) * 25deg)) rotateY(calc(var(--pointer-x) * -20deg));
+    }
+    .card[data-active="true"]:hover .card__front img {
+      translate: calc(var(--pointer-x) * 5%) calc(var(--pointer-y) * 5%);
+    }
+    .card:not(:hover) .card__front img {
+      transition: translate 0.2s;
+    }
+
+    /* show refraction & spotlight on hover */
+    .card[data-active="true"]:hover .refraction,
+    .card[data-active="true"]:hover .spotlight::before {
+      opacity: 1;
+    }
+
+    [data-explode="true"] .minimap {
+      pointer-events: all;
+      visibility: visible;
+    }
+    [data-explode="true"] .arrow {
+      opacity: 0;
+    }
+    [data-explode="true"] .card {
+      pointer-events: none;
+      transition: transform 0.2s 0.2s;
+      transform: rotateX(-24deg) rotateY(32deg) rotateX(90deg);
+    }
+    [data-explode="true"] .card .watermark,
+    [data-explode="true"] .card .pattern,
+    [data-explode="true"] .card .debug,
+    [data-explode="true"] .card .img,
+    [data-explode="true"] .card .spotlight::after,
+    [data-explode="true"] .card .card__frame,
+    [data-explode="true"] .card .spotlight {
+      transition-property: transform, opacity;
+      transition-duration: 0.2s;
+      transition-delay: 0.4s;
+      transform: translate3d(0, 0, calc(var(--index) * 80px));
+    }
+    [data-explode="true"] .card .card__front .debug { --index: -2; }
+    [data-explode="true"] .card .card__front .img { --index: -3; }
+    [data-explode="true"] .card .card__front .pattern { --index: -1; }
+    [data-explode="true"] .card .card__front .watermark { --index: 0; }
+    [data-explode="true"] .card .card__front .card__frame { --index: 1; }
+    [data-explode="true"] .card .card__front .spotlight { --index: 2; }
+    [data-explode="true"] .debug {
+      visibility: visible;
+      opacity: 1;
+    }
+    [data-explode="true"] .spotlight::after {
+      opacity: 1;
+    }
+
+    .minimap {
+      position: fixed;
+      width: 60px;
+      aspect-ratio: 5/7;
+      background: hsl(0 0% 50%);
+      top: 50%;
+      left: 50%;
+      translate: calc(var(--card-width) * 1) -50%;
+      border-radius: 6px;
+      cursor: pointer;
+      border: var(--border-color) 4px solid;
+      z-index: 999999;
+      transform: translate3d(0,0,100vmin);
+      pointer-events: none;
+      visibility: hidden;
+    }
+    .minimap .minimap__stats {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0.7;
+      font-family: monospace;
+    }
+    .minimap .minimap__stats span {
+      white-space: nowrap;
+    }
+    .minimap::after {
+      content: 'trackpad';
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      font-family: 'Sora', sans-serif;
+      transform: translate(-50%, -50%) rotate(-90deg) translateY(100%);
+      font-size: 0.875rem;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .arrow {
+      display: inline-block;
+      opacity: 0;
+      position: absolute;
+      font-size: 0.875rem;
+      font-family: 'Gloria Hallelujah', cursive;
+      transition: opacity 0.26s ease-out;
+    }
+    .arrow.arrow--debug {
+      top: 50%;
+      left: 50%;
+      rotate: 10deg;
+      translate: calc(-40% + var(--card-width) * -1) 0;
+      width: 80px;
+      z-index: 99999;
+    }
+    .arrow.arrow--debug span {
+      display: inline-block;
+      rotate: -24deg;
+      translate: 30% 100%;
+    }
+    .arrow.arrow--debug svg {
+      rotate: 10deg;
+      scale: 1 -1;
+      translate: 120% 20%;
+      rotate: -25deg;
+      width: 80%;
+    }
+    @media (max-width: 580px) {
+      .arrow.arrow--debug { translate: -50% calc(var(--card-width) * 7 / 5 * 0.5); }
+      .arrow.arrow--debug span { translate: 80% 160%; }
+      .arrow.arrow--debug svg { rotate: 190deg; bottom: 100%; translate: 0 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="minimap">
+    <div class="minimap__stats">
+      <span>x: 0</span>
+      <span>y: 0</span>
+    </div>
+  </div>
+
+
+  <div class="scene">
+    <article class="card" data-active="false" id="card">
+      <button aria-label="Flip card" aria-pressed="false" id="flipBtn"></button>
+      <div class="card__content">
+        <div class="card__rear card__face">
+          <img class="backdrop" src="https://assets.codepen.io/605876/techtrades-backdrop.png" alt="" />
+          <div class="card__emboss">
+            <div class="wordmark">
+              <img src="https://assets.codepen.io/605876/techtrades-wordmark.png" alt="Tech Trades" />
+            </div>
+            <div class="wordmark">
+              <img src="https://assets.codepen.io/605876/techtrades-wordmark.png" alt="Tech Trades" />
+            </div>
+            <img class="gemstone" src="https://assets.codepen.io/605876/techtrades-gemstone.png" alt="" />
+          </div>
+          <div class="spotlight"></div>
+        </div>
+        <div class="card__front">
+          <div class="img">
+            <img src="profile.png" alt="" />
+          </div>
+          <div class="debug">
+            <div class="refraction refraction--debug"></div>
+            <div class="refraction refraction--debug"></div>
+          </div>
+          <div class="debug debug--clipped">
+            <div class="refraction refraction--debug"></div>
+            <div class="refraction refraction--debug"></div>
+          </div>
+
+          <div class="pattern">
+            <div class="refraction"></div>
+            <div class="refraction"></div>
+          </div>
+          <div class="watermark">
+            <div class="refraction"></div>
+            <div class="refraction"></div>
+          </div>
+
+          <div class="card__frame card__emboss">
+            <h3>
+              <span>Galvin Alfito D</span><br /><span>Web Development</span>
+            </h3>
+              <svg class="signature" width="164" height="103" viewBox="0 0 164 103" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.8118 35.4001C20.2838 35.4001 18.4278 35.4001 15.3679 35.928C12.2011 36.4745 10.4198 39.392 9.21983 41.12C6.82971 44.5617 8.01184 56.904 10.5319 64.852C12.2657 70.3203 21.0519 70.328 32.2359 70.336C38.1127 70.3402 41.3239 63.16 43.7398 58.352C44.352 57.1337 44.0118 55.432 44.1438 55.54C49.6992 60.0857 47.2119 71.64 47.8758 76.712C48.7471 83.3673 44.0279 88.168 39.3639 92.188C35.2856 95.7031 29.3718 96.984 22.5719 99.392C16.3947 101.58 10.4439 101.8 5.24785 101.272C3.16298 101.06 2.42787 99.688 1.88786 98.352C0.7529 95.544 0.81183 92.216 1.47183 88.892C3.13944 80.4934 13.0519 78.344 21.8318 75.412C37.2525 70.2625 44.2359 71.672 53.1799 69.808C60.1725 68.3507 66.3798 66.072 71.0639 63.412C75.0885 61.1265 77.0679 55.96 79.7358 49.16C80.9863 45.9728 81.3398 42.088 80.0279 40.868C68.7423 30.3737 64.0279 55.112 61.8839 64.82C61.1612 68.0922 61.6119 72.12 62.0079 74.688C62.4039 77.256 63.1959 78.312 64.9238 78.856C75.1555 82.0772 85.0519 68.7601 88.0039 63.552C88.6555 62.4023 89.0679 61.288 89.3399 62.724C89.6119 64.16 89.6119 68.12 90.1399 70.556C90.6679 72.992 91.7238 73.784 93.1918 73.928C99.8265 74.5788 102.668 66.888 107.328 63.804C108.895 62.7669 109.604 67.392 111.464 68.46C113.535 69.6491 116.004 69.256 118.26 70.064C122.043 71.4189 125.068 65.544 126.8 64.868C129.053 63.9888 128.804 70.584 130.4 72.588C131.421 73.8699 133.076 70.344 134.136 69.8C134.978 69.3678 136.252 72.424 137.856 73.38C139.46 74.336 141.308 74.072 142.656 73.276C145.247 71.7457 146.404 68.744 148.264 67.144C149.172 66.3624 150.652 66.6 151.596 67.128C152.54 67.656 153.068 68.712 153.868 69.256C154.668 69.8 155.724 69.8 156.268 69.14C159.802 64.8523 158.412 57.288 159.208 49.964C159.954 43.1013 161.34 38.36 161.48 31.416C160.812 43.848 161.076 62.32 161.476 65.772C161.612 67.904 161.612 70.808 162.412 73.8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <path d="M52.0118 93.8C62.0918 89.816 77.5638 86.072 88.6358 82.748C99.4777 79.4931 106.924 76.744 117.832 74.74C126.571 73.1344 133.564 72.744 144.508 70.872C147.724 70.6 151.188 69.808 155.844 68.608C158.124 68.2 160.236 68.2 162.412 68.2" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <path d="M130.412 1C119.308 1 97.8998 1.52799 92.9638 1.93199C88.0854 2.33128 83.4999 6.056 79.4959 9.516C76.0931 12.4564 73.8839 15.92 72.9518 18.448C72.1353 20.6628 72.0118 23.648 72.9359 26.976C74.8293 33.7958 83.4518 32.728 92.1118 34.992C98.2262 36.5906 115.34 36.2 125.86 35.404C131.77 34.9569 138.108 31.96 147.312 27.016C153.375 23.759 157.604 21.544 158.54 19.416C160.39 15.2095 152.556 11.688 147.236 8.34399C141.69 4.85793 135.772 5 130.432 4.33598C125.092 3.93599 118.716 3.39999 113.496 2.736C112.292 2.60001 110.972 2.60001 109.612 2.60001" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <path d="M105.612 20.2H111.212" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            <img src="profile.png" alt="" />
+          </div>
+          <div class="spotlight"></div>
+          <div class="glare-container">
+            <div class="glare"></div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <svg class="sr-only" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="lighting">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"></feGaussianBlur>
+        <feSpecularLighting result="lighting" in="blur" surfaceScale="8" specularConstant="12" specularExponent="120" lighting-color="hsl(0 0% 6%)">
+          <fePointLight x="50" y="50" z="300"></fePointLight>
+        </feSpecularLighting>
+        <feComposite in="lighting" in2="SourceAlpha" operator="in" result="composite"></feComposite>
+        <feComposite in="SourceGraphic" in2="composite" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litPaint"></feComposite>
+      </filter>
+      <filter id="sticker">
+        <feMorphology in="SourceAlpha" result="dilate" operator="dilate" radius="2"></feMorphology>
+        <feFlood flood-color="hsl(0 0% 100%)" result="outlinecolor"></feFlood>
+        <feComposite in="outlinecolor" in2="dilate" operator="in" result="outlineflat"></feComposite>
+        <feMerge result="merged">
+          <feMergeNode in="outlineflat"></feMergeNode>
+          <feMergeNode in="SourceGraphic"></feMergeNode>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <script>
+    (function() {
+      const CARD = document.getElementById('card');
+      const FLIP_BTN = document.getElementById('flipBtn');
+      const MINIMAP = document.querySelector('.minimap');
+      const HTML = document.documentElement;
+      CARD.dataset.active = 'false';
+      const glare = document.querySelector('.glare');
+      const watermark = document.querySelector('.watermark');
+      const frontImg = document.querySelector('.card__front .img img');
+      const sticker = document.querySelector('.sticker');
+      const heading = document.querySelector('.card__frame h3');
+      const sigPaths = document.querySelectorAll('.sig, .ear, .eye, .nose');
+      
+      gsap = null; 
+      
+      function runReveal() {
+
+        CARD.dataset.active = 'true';
+        
+        if (glare) {
+          glare.style.transition = 'transform 0.65s ease-in-out';
+          glare.style.transform = 'translateX(-100%)';
+        }
+        
+        if (watermark) watermark.style.opacity = '1';
+        if (frontImg) frontImg.style.opacity = '1';
+        if (sticker) sticker.style.opacity = '1';
+        if (heading) heading.style.opacity = '1';
+        
+        sigPaths.forEach(p => p.style.stroke = 'hsl(45 20% 60%)');
+        
+
+        document.querySelector('.arrow').style.opacity = '0.8';
+      }
+      
+
+      setTimeout(runReveal, 500);
+
+
+      function updatePointer(e) {
+        const bounds = HTML.dataset.explode === 'true' 
+          ? MINIMAP.getBoundingClientRect() 
+          : CARD.getBoundingClientRect();
+        
+        const x = e.clientX;
+        const y = e.clientY;
+        const posX = x - bounds.left;
+        const posY = y - bounds.top;
+        const ratioX = posX / bounds.width - 0.5;
+        const ratioY = posY / bounds.height - 0.5;
+        const pointerX = Math.min(1, Math.max(-1, ratioX * 2)).toFixed(2);
+        const pointerY = Math.min(1, Math.max(-1, ratioY * 2)).toFixed(2);
+        
+        CARD.style.setProperty('--pointer-x', pointerX);
+        CARD.style.setProperty('--pointer-y', pointerY);
+        
+        const statSpans = document.querySelectorAll('.minimap__stats span');
+        if (statSpans[0]) statSpans[0].innerText = `x: ${pointerX}`;
+        if (statSpans[1]) statSpans[1].innerText = `y: ${pointerY}`;
+        
+        const light = document.querySelector('fePointLight');
+        if (light) {
+          light.setAttribute('x', Math.floor(x - bounds.left));
+          light.setAttribute('y', Math.floor(y - bounds.top));
+        }
+      }
+      
+      document.body.addEventListener('pointermove', updatePointer);
+      
+      FLIP_BTN.addEventListener('click', () => {
+        const pressed = FLIP_BTN.getAttribute('aria-pressed') === 'true' ? 'false' : 'true';
+        FLIP_BTN.setAttribute('aria-pressed', pressed);
+      });
+      
+      document.getElementById('toggleTheme').addEventListener('click', () => {
+        const current = HTML.dataset.theme;
+        if (current === 'dark') HTML.dataset.theme = 'light';
+        else if (current === 'light') HTML.dataset.theme = 'system';
+        else HTML.dataset.theme = 'dark';
+      });
+      
+      document.getElementById('toggleExplode').addEventListener('click', () => {
+        const current = HTML.dataset.explode === 'true' ? 'false' : 'true';
+        HTML.dataset.explode = current;
+      });
+      
+      document.getElementById('toggleAnimate').addEventListener('click', () => {
+        const current = HTML.dataset.animate === 'true' ? 'false' : 'true';
+        HTML.dataset.animate = current;
+      });
+      
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const light = document.querySelector('fePointLight');
+      if (light) {
+        light.setAttribute('x', centerX);
+        light.setAttribute('y', centerY);
+      }
+    })();
+  </script>
+</body>
+</html>
