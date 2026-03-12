@@ -93,7 +93,7 @@
 
     :root {
       --border-color: hsl(0 0% 25%);
-      --card-width: 260px;
+      --card-width: 280px;
       --pointer-x: 0;
       --pointer-y: 0;
     }
@@ -271,6 +271,46 @@
       left: calc(var(--border) * 0.65);
       z-index: 100;
       opacity: 0;
+    }
+
+    /* Quote Styling */
+    .quote-container {
+      position: absolute;
+      bottom: calc(var(--border) * 0.8);
+      left: calc(var(--border) * 0.8);
+      right: calc(var(--border) * 0.8);
+      z-index: 101;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      border-radius: 12px;
+      padding: 10px 15px;
+      border-left: 3px solid #f97316;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    
+    .card[data-active="true"] .quote-container {
+      opacity: 1;
+    }
+    
+    .quote-text {
+      color: white;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      font-style: italic;
+      margin: 0;
+      font-family: 'Gloria Hallelujah', cursive;
+      word-wrap: break-word;
+    }
+    
+    .quote-author {
+      color: #f97316;
+      font-size: 0.7rem;
+      text-align: right;
+      margin-top: 5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .card:has([aria-pressed="true"]) .card__content {
@@ -574,7 +614,6 @@
     </div>
   </div>
 
-
   <div class="scene">
     <article class="card" data-active="false" id="card">
       <button aria-label="Flip card" aria-pressed="false" id="flipBtn"></button>
@@ -618,14 +657,21 @@
             <h3>
               <span>Galvin Alfito D</span><br /><span>Web Development</span>
             </h3>
-              <svg class="signature" width="164" height="103" viewBox="0 0 164 103" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="signature" width="164" height="103" viewBox="0 0 164 103" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M20.8118 35.4001C20.2838 35.4001 18.4278 35.4001 15.3679 35.928C12.2011 36.4745 10.4198 39.392 9.21983 41.12C6.82971 44.5617 8.01184 56.904 10.5319 64.852C12.2657 70.3203 21.0519 70.328 32.2359 70.336C38.1127 70.3402 41.3239 63.16 43.7398 58.352C44.352 57.1337 44.0118 55.432 44.1438 55.54C49.6992 60.0857 47.2119 71.64 47.8758 76.712C48.7471 83.3673 44.0279 88.168 39.3639 92.188C35.2856 95.7031 29.3718 96.984 22.5719 99.392C16.3947 101.58 10.4439 101.8 5.24785 101.272C3.16298 101.06 2.42787 99.688 1.88786 98.352C0.7529 95.544 0.81183 92.216 1.47183 88.892C3.13944 80.4934 13.0519 78.344 21.8318 75.412C37.2525 70.2625 44.2359 71.672 53.1799 69.808C60.1725 68.3507 66.3798 66.072 71.0639 63.412C75.0885 61.1265 77.0679 55.96 79.7358 49.16C80.9863 45.9728 81.3398 42.088 80.0279 40.868C68.7423 30.3737 64.0279 55.112 61.8839 64.82C61.1612 68.0922 61.6119 72.12 62.0079 74.688C62.4039 77.256 63.1959 78.312 64.9238 78.856C75.1555 82.0772 85.0519 68.7601 88.0039 63.552C88.6555 62.4023 89.0679 61.288 89.3399 62.724C89.6119 64.16 89.6119 68.12 90.1399 70.556C90.6679 72.992 91.7238 73.784 93.1918 73.928C99.8265 74.5788 102.668 66.888 107.328 63.804C108.895 62.7669 109.604 67.392 111.464 68.46C113.535 69.6491 116.004 69.256 118.26 70.064C122.043 71.4189 125.068 65.544 126.8 64.868C129.053 63.9888 128.804 70.584 130.4 72.588C131.421 73.8699 133.076 70.344 134.136 69.8C134.978 69.3678 136.252 72.424 137.856 73.38C139.46 74.336 141.308 74.072 142.656 73.276C145.247 71.7457 146.404 68.744 148.264 67.144C149.172 66.3624 150.652 66.6 151.596 67.128C152.54 67.656 153.068 68.712 153.868 69.256C154.668 69.8 155.724 69.8 156.268 69.14C159.802 64.8523 158.412 57.288 159.208 49.964C159.954 43.1013 161.34 38.36 161.48 31.416C160.812 43.848 161.076 62.32 161.476 65.772C161.612 67.904 161.612 70.808 162.412 73.8" stroke="white" stroke-width="2" stroke-linecap="round"/>
               <path d="M52.0118 93.8C62.0918 89.816 77.5638 86.072 88.6358 82.748C99.4777 79.4931 106.924 76.744 117.832 74.74C126.571 73.1344 133.564 72.744 144.508 70.872C147.724 70.6 151.188 69.808 155.844 68.608C158.124 68.2 160.236 68.2 162.412 68.2" stroke="white" stroke-width="2" stroke-linecap="round"/>
               <path d="M130.412 1C119.308 1 97.8998 1.52799 92.9638 1.93199C88.0854 2.33128 83.4999 6.056 79.4959 9.516C76.0931 12.4564 73.8839 15.92 72.9518 18.448C72.1353 20.6628 72.0118 23.648 72.9359 26.976C74.8293 33.7958 83.4518 32.728 92.1118 34.992C98.2262 36.5906 115.34 36.2 125.86 35.404C131.77 34.9569 138.108 31.96 147.312 27.016C153.375 23.759 157.604 21.544 158.54 19.416C160.39 15.2095 152.556 11.688 147.236 8.34399C141.69 4.85793 135.772 5 130.432 4.33598C125.092 3.93599 118.716 3.39999 113.496 2.736C112.292 2.60001 110.972 2.60001 109.612 2.60001" stroke="white" stroke-width="2" stroke-linecap="round"/>
               <path d="M105.612 20.2H111.212" stroke="white" stroke-width="2" stroke-linecap="round"/>
-              </svg>
+            </svg>
             <img src="profile.png" alt="" />
           </div>
+          
+          <!-- QUOTE CONTAINER - AKAN BERUBAH SETIAP HARI -->
+          <div class="quote-container" id="quoteContainer">
+            <p class="quote-text" id="quoteText">Loading quote...</p>
+            <div class="quote-author" id="quoteAuthor">-</div>
+          </div>
+          
           <div class="spotlight"></div>
           <div class="glare-container">
             <div class="glare"></div>
@@ -663,6 +709,9 @@
       const FLIP_BTN = document.getElementById('flipBtn');
       const MINIMAP = document.querySelector('.minimap');
       const HTML = document.documentElement;
+      const quoteText = document.getElementById('quoteText');
+      const quoteAuthor = document.getElementById('quoteAuthor');
+      
       CARD.dataset.active = 'false';
       const glare = document.querySelector('.glare');
       const watermark = document.querySelector('.watermark');
@@ -673,8 +722,56 @@
       
       gsap = null; 
       
-      function runReveal() {
+      // KOLEKSI QUOTE - BISA DITAMBAH SESUKA HATI
+      const quotes = [
+        { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+        { text: "Code is like humor. When you have to explain it, it's bad.", author: "Cory House" },
+        { text: "Simplicity is the soul of efficiency.", author: "Austin Freeman" },
+        { text: "First, solve the problem. Then, write the code.", author: "John Johnson" },
+        { text: "Experience is the name everyone gives to their mistakes.", author: "Oscar Wilde" },
+        { text: "Java is to JavaScript what car is to Carpet.", author: "Chris Heilmann" },
+        { text: "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.", author: "Martin Fowler" },
+        { text: "The best error message is the one that never shows up.", author: "Thomas Fuchs" },
+        { text: "Programming isn't about what you know; it's about what you can figure out.", author: "Chris Pine" },
+        { text: "It's not a bug; it's an undocumented feature.", author: "Anonymous" },
+        { text: "Make it work, make it right, make it fast.", author: "Kent Beck" },
+        { text: "Talk is cheap. Show me the code.", author: "Linus Torvalds" },
+        { text: "The function of good software is to make the complex appear to be simple.", author: "Grady Booch" },
+        { text: "Before software can be reusable it first has to be usable.", author: "Ralph Johnson" },
+        { text: "The best way to predict the future is to implement it.", author: "David Heinemeier Hansson" },
+        { text: "Sometimes it pays to stay in bed on Monday, rather than spending the rest of the week debugging Monday’s code.", author: "Dan Salomon" },
+        { text: "Optimism is an occupational hazard of programming: feedback is the treatment.", author: "Kent Beck" },
+        { text: "The most disastrous thing that you can ever learn is your first programming language.", author: "Alan Kay" },
+        { text: "The most important property of a program is whether it accomplishes the intention of its user.", author: "C.A.R. Hoare" },
+        { text: "If debugging is the process of removing software bugs, then programming must be the process of putting them in.", author: "Edsger Dijkstra" },
+        { text: "Don't worry if it doesn't work right. If everything did, you'd be out of a job.", author: "Mosher's Law of Software Engineering" }
+      ];
 
+      // Fungsi untuk mendapatkan quote berdasarkan tanggal
+      function getDailyQuote() {
+        const today = new Date();
+        const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+        
+        // Menggunakan dayOfYear sebagai indeks, modulo panjang quotes
+        const quoteIndex = dayOfYear % quotes.length;
+        
+        return quotes[quoteIndex];
+      }
+
+      // Update quote setiap hari
+      function updateQuote() {
+        const dailyQuote = getDailyQuote();
+        quoteText.textContent = `"${dailyQuote.text}"`;
+        quoteAuthor.textContent = `— ${dailyQuote.author}`;
+      }
+
+      // Panggil fungsi update quote
+      updateQuote();
+
+      // Optional: Update quote setiap jam (untuk jaga-jaga kalau website kebuka pas pergantian hari)
+      // setInterval(updateQuote, 60 * 60 * 1000); // Update setiap jam
+
+      function runReveal() {
         CARD.dataset.active = 'true';
         
         if (glare) {
@@ -689,13 +786,10 @@
         
         sigPaths.forEach(p => p.style.stroke = 'hsl(45 20% 60%)');
         
-
         document.querySelector('.arrow').style.opacity = '0.8';
       }
       
-
       setTimeout(runReveal, 500);
-
 
       function updatePointer(e) {
         const bounds = HTML.dataset.explode === 'true' 
@@ -732,22 +826,8 @@
         FLIP_BTN.setAttribute('aria-pressed', pressed);
       });
       
-      document.getElementById('toggleTheme').addEventListener('click', () => {
-        const current = HTML.dataset.theme;
-        if (current === 'dark') HTML.dataset.theme = 'light';
-        else if (current === 'light') HTML.dataset.theme = 'system';
-        else HTML.dataset.theme = 'dark';
-      });
-      
-      document.getElementById('toggleExplode').addEventListener('click', () => {
-        const current = HTML.dataset.explode === 'true' ? 'false' : 'true';
-        HTML.dataset.explode = current;
-      });
-      
-      document.getElementById('toggleAnimate').addEventListener('click', () => {
-        const current = HTML.dataset.animate === 'true' ? 'false' : 'true';
-        HTML.dataset.animate = current;
-      });
+      // Optional: Tombol untuk refresh quote (hidden, bisa diaktifkan dengan console)
+      window.refreshQuote = updateQuote;
       
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
